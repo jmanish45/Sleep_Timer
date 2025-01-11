@@ -1,22 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Sleep Timer",
+  "description": "Set a timer to stop video/audio playback.",
   "version": "1.0",
-  "description": "Set a timer to stop video/audio playback automatically.",
-  "permissions": ["activeTab", "notifications", "scripting", "storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
+      
     }
   },
+  "permissions": ["storage", "notifications", "scripting"],
   "background": {
     "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"]
-    }
-  ]
+  }
 }
