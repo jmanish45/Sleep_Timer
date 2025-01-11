@@ -7,7 +7,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       message: "Time's up! Stopping playback.",
     });
 
-    // Optionally stop playback (this requires additional permissions or scripts on content pages)
-    console.log("Playback stopped.");
+    // Send a message to the content script to stop playback
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "stopPlayback" }, (response) => {
+        console.log(response.status);
+      });
+    });
   }
 });
