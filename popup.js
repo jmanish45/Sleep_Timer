@@ -1,51 +1,20 @@
-let intervalId; // To store the interval for the countdown
-
 document.getElementById("startTimer").addEventListener("click", () => {
-  const minutes = parseInt(document.getElementById("timer").value);
-  if (!isNaN(minutes) && minutes > 0) {
-    const endTime = Date.now() + minutes * 60000;
+  const timerInput = document.getElementById("timer");
+  const timeInMinutes = parseInt(timerInput.value);
 
-    // Save the end time in local storage
-    chrome.storage.local.set({ sleepTimerEnd: endTime });
-
-    // Start the countdown
-    startCountdown(endTime);
-    alert(`Timer set for ${minutes} minutes.`);
-  } else {
-    alert("Please enter a valid number of minutes.");
+  if (isNaN(timeInMinutes) || timeInMinutes <= 0) {
+    alert("Please enter a valid time in minutes.");
+    return;
   }
-});
 
-// Function to start the countdown
-function startCountdown(endTime) {
-  clearInterval(intervalId); // Clear any existing countdown
-  intervalId = setInterval(() => {
-    const now = Date.now();
-    const timeLeft = endTime - now;
+  // Calculate the time in milliseconds
+  const timeInMilliseconds = timeInMinutes * 60 * 1000;
 
-    if (timeLeft <= 0) {
-      clearInterval(intervalId);
-      document.getElementById("timerDisplay").innerText = "Time Left: 00:00";
-      alert("Time's up! Playback will stop.");
-      chrome.runtime.sendMessage({ action: "stopPlayback" });
-    } else {
-      // Update the timer display
-      const minutes = Math.floor(timeLeft / 60000);
-      const seconds = Math.floor((timeLeft % 60000) / 1000);
-      document.getElementById("timerDisplay").innerText = `Time Left: ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }
-  }, 1000);
-}
+  // Set a timeout to stop playback
+  setTimeout(() => {
+    // Send a message to the background script to stop playback
+    chrome.runtime.sendMessage({ action: "stopPlayback" });
+  }, timeInMilliseconds);
 
-// Load the saved timer on popup open
-chrome.storage.local.get(["sleepTimerEnd"], (result) => {
-  if (result.sleepTimerEnd) {
-    const endTime = result.sleepTimerEnd;
-    if (Date.now() < endTime) {
-      startCountdown(endTime);
-    } else {
-      // Timer already expired
-      document.getElementById("timerDisplay").innerText = "Time Left: 00:00";
-    }
-  }
+  alert(`Timer set for ${timeInMinutes} minutes.`);
 });

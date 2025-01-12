@@ -1,18 +1,12 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "stopPlayback") {
-    // Stop playback immediately
+    // Query the active tab
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs.length > 0) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "stopPlayback" }, (response) => {
-          if (response && response.status) {
-            console.log("Playback stopped successfully:", response.status);
-          } else {
-            console.log("Failed to stop playback or no response.");
-          }
-        });
+        // Send a message to the content script to stop playback
+        chrome.tabs.sendMessage(tabs[0].id, { action: "stopPlayback" });
       }
     });
-
     sendResponse({ status: "Playback stopping initiated" });
   }
 });
